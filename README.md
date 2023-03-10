@@ -11,7 +11,7 @@ The following formats are supported:
 (with-slog (:format :json)
   (slog-write "hello"))
 
-{"time"="2023-03-11T00:08:34.496032+01:00", "message"="hello"}
+{"time":"2023-03-11T00:08:34.496032+01:00", "message":"hello"}
 ```
 #### :lisp
 ```

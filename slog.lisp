@@ -51,13 +51,7 @@
 (defun slog-new (&key context (format :lisp) (stream *standard-output*) include exclude)
   (make-slog :context context :format format :stream stream :include include :exclude exclude))
 
-(defmethod slog-format-key ((fmt (eql :json)) key)
-  (with-output-to-string (out)
-    (write-char #\" out)
-    (write-string (string-downcase (symbol-name key)) out)
-    (write-char #\" out)))
-
-(defmethod slog-format-key ((fmt (eql :text)) key)
+(defmethod slog-format-key (fmt key)
   (string-downcase (symbol-name key)))
 
 (defmethod slog-format-value (fmt val)
@@ -85,7 +79,10 @@
 (defmethod slog-format-value ((fmt (eql :text)) (val timestamp))
   (format-timestring nil val :format +text-time-format+))
 
-(defmethod slog-format-attribute (fmt key val)
+(defmethod slog-format-attribute ((fmt (eql :json)) key val)
+  (format nil "\"~a\":~a" (slog-format-key fmt key) (slog-format-value fmt val)))
+
+(defmethod slog-format-attribute ((fmt (eql :text)) key val)
   (format nil "~a=~a" (slog-format-key fmt key) (slog-format-value fmt val)))
 
 (defmethod slog-separator ((fmt (eql :json)))
