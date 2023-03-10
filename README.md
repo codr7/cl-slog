@@ -29,7 +29,7 @@ time=2023-3-11 0:7:54:624 message="hello"
 ```
 
 ### Tags
-Instead of imposing a strict hierarchy of log levels, cl-slog uses tags exclusively to filter logs.  
+Rather than imposing a strict hierarchy of log levels, cl-slog supports using tags to filter logs.  
 
 Each log write may include multiple `:tag`-arguments,
 ```
