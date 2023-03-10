@@ -59,10 +59,10 @@ Nested lists allows matching multiple tags.
 `with-slog-context` may be used to add attributes to all writes within scope.
 ```
 (with-slog ()
-  (with-slog-context (:x 42)
-    (slog-write "hello")))
+  (with-slog-context (:x 7)
+    (slog-write "hello" :y 42)))
 
-(:TIME @2023-03-11T00:10:12.366268+01:00 :MESSAGE "hello" :X 42)
+(:TIME @2023-03-11T00:10:12.366268+01:00 :MESSAGE "hello" :X 7 :Y 42)
 ```
 
 ### Output
