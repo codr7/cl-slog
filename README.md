@@ -1,10 +1,10 @@
 # cl-slog
 
 ### Intro
-cl-slog implments structured logging for Common Lisp.
+cl-slog implements structured logging for Common Lisp.
 
 ### Formats
-cl-slog supports the following formats:
+The following formats are supported:
 
 - :json
 - :lisp
@@ -18,25 +18,25 @@ cl-slog supports the following formats:
 ```
 
 ### Tags
-Each log write may include multiple `:tag`-arguments, and each `:tag`-argument may include multiple tags.
-
+Each log write may include multiple `:tag`-arguments,
 ```
-  (slog-write "hello" :tag :http :tag :request)
+(with-slog ()
+  (slog-write "hello" :tag :http :tag :request))
 ```
+and each `:tag`-argument may include multiple tags.
 ```
-  (slog-write "hello" :tag '(:http :request))
+(with-slog ()
+  (slog-write "hello" :tag '(:http :request)))
 ```
 
 Tags may be included/excluded in `with-slog`.
-
 ```
 (with-slog (:include '(:http)
             :exclude '(:request))
   (slog-write "hello" :tag :http :tag :request))
 ```
 
-Including/excluding lists allows matching multiple tags.
-
+Nested lists allows matching multiple tags.
 ```
 (with-slog (:include '((:http request)))
   (slog-write "hello" :tag http :tag request))
