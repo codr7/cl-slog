@@ -9,23 +9,23 @@ The following formats are supported:
 #### :json
 ```
 (with-slog (:format :json)
-  (slog-write "hello"))
+  (slog-write "hello" :x 42))
 
-{"time":"2023-03-11T00:08:34.496032+01:00", "message":"hello"}
+{"time":"2023-03-11T00:08:34.496032+01:00", "message":"hello" "x": 42}
 ```
 #### :lisp
 ```
 (with-slog ()
   (slog-write "hello"))
 
-(:TIME @2023-03-11T00:06:55.308025+01:00 :MESSAGE "hello")
+(:TIME @2023-03-11T00:06:55.308025+01:00 :MESSAGE "hello" :X 42)
 ```
 #### :text
 ```
 (with-slog (:format :text)
   (slog-write "hello"))
 
-time=2023-3-11 0:7:54:624 message="hello"
+time=2023-3-11 0:7:54:624 message="hello" x=42
 ```
 
 ### Tags
@@ -59,10 +59,10 @@ Nested lists allows matching multiple tags.
 `with-slog-context` may be used to add attributes to all writes within scope.
 ```
 (with-slog ()
-  (with-slog-context (:x 7)
-    (slog-write "hello" :y 42)))
+  (with-slog-context (:x 42)
+    (slog-write "hello" :y "world")))
 
-(:TIME @2023-03-11T00:10:12.366268+01:00 :MESSAGE "hello" :X 7 :Y 42)
+(:TIME @2023-03-11T00:10:12.366268+01:00 :MESSAGE "hello" :X 42 :Y "world")
 ```
 
 ### Output
