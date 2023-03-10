@@ -16,7 +16,7 @@
 	   slog-new
 	   slog-separator
 	   slog-stream
-	   slog-tag
+	   slog-tags
 	   slog-write
 	   slog-write-record
 	   with-slog
@@ -123,7 +123,7 @@
 		 out)))
     (nreverse (rec lst nil))))
 
-(defun slog-tag (&rest ats)
+(defun slog-tags (&rest ats)
   (labels ((rec (in tags ats)
 	     (if in
 		 (let ((k (pop in))
@@ -150,7 +150,7 @@
   (tags-match? (slog-exclude log) tags))
 
 (defmethod slog-write-record (log time msg &rest ats)
-  (multiple-value-bind (tags ats) (apply #'slog-tag ats)
+  (multiple-value-bind (tags ats) (apply #'slog-tags ats)
     (when (and (slog-include? log tags) (not (slog-exclude? log tags)))
       (format (slog-stream log)
 	      "~a~%"
