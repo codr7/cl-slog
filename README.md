@@ -6,16 +6,29 @@ cl-slog implements structured logging for Common Lisp.
 ### Formats
 The following formats are supported:
 
-- :json
-- :lisp
-- :text
-
+#### :json
 ```
 (with-slog (:format :json)
-  (slog-write "hello" :tag :http :tag :request))
+  (slog-write "hello"))
 
-{"time"="2023-03-10T23:30:26.182261+01:00", "message"="hello"}
+{"time"="2023-03-11T00:08:34.496032+01:00", "message"="hello"}
 ```
+#### :lisp
+```
+(with-slog ()
+  (slog-write "hello"))
+
+(:TIME @2023-03-11T00:06:55.308025+01:00 :MESSAGE "hello")
+```
+#### :text
+```
+(with-slog (:format :text)
+  (slog-write "hello"))
+
+time=2023-3-11 0:7:54:624 message="hello"
+```
+
+
 
 ### Tags
 Instead of imposing a strict hierarchy of log levels, cl-slog uses tags exclusively to filter logs.  
@@ -24,15 +37,11 @@ Each log write may include multiple `:tag`-arguments,
 ```
 (with-slog ()
   (slog-write "hello" :tag :http :tag :request))
-
-(:TIME @2023-03-11T00:00:25.402814+01:00 :MESSAGE "hello")
 ```
 and each `:tag`-argument may include multiple tags.
 ```
-(with-slog (:format :text)
+(with-slog ()
   (slog-write "hello" :tag '(:http :request)))
-
-time=2023-3-11 0:0:46:446 message="hello"
 ```  
 
 Tags may be included/excluded in `with-slog`.
@@ -51,11 +60,11 @@ Nested lists allows matching multiple tags.
 ### Contexts
 `with-slog-context` may be used to add attributes to all writes within scope.
 ```
-(with-slog (:format :json)
+(with-slog ()
   (with-slog-context (:x 42)
     (slog-write "hello")))
 
-{"time"="2023-03-10T23:30:26.182261+01:00", "message"="hello", "x"=42}
+(:TIME @2023-03-11T00:10:12.366268+01:00 :MESSAGE "hello" :X 42)
 ```
 
 ### Output
@@ -64,7 +73,4 @@ Passing `:stream` allows redirecting output.
 (with-output-to-string (out)
   (with-slog (:stream out)
     (slog-write "hello")))
-
-"(:TIME @2023-03-10T23:36:30.373368+01:00 :MESSAGE \"hello\")
-"
 ```
