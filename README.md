@@ -18,23 +18,29 @@ The following formats are supported:
 ```
 
 ### Tags
+Instead of imposing a strict hierarchy of log levels, cl-slog uses tags exclusively to filter logs.  
+
 Each log write may include multiple `:tag`-arguments,
 ```
 (with-slog ()
   (slog-write "hello" :tag :http :tag :request))
+
+(:TIME @2023-03-11T00:00:25.402814+01:00 :MESSAGE "hello")
 ```
 and each `:tag`-argument may include multiple tags.
 ```
-(with-slog ()
+(with-slog (:format :text)
   (slog-write "hello" :tag '(:http :request)))
-```
+
+time=2023-3-11 0:0:46:446 message="hello"
+```  
 
 Tags may be included/excluded in `with-slog`.
 ```
 (with-slog (:include '(:http)
             :exclude '(:request))
   (slog-write "hello" :tag :http :tag :request))
-```
+```  
 
 Nested lists allows matching multiple tags.
 ```
@@ -43,8 +49,7 @@ Nested lists allows matching multiple tags.
 ```
 
 ### Contexts
-```with-slog-context``` may be used to add attributes to all writes within scope.
-
+`with-slog-context` may be used to add attributes to all writes within scope.
 ```
 (with-slog (:format :json)
   (with-slog-context (:x 42)
@@ -55,7 +60,6 @@ Nested lists allows matching multiple tags.
 
 ### Output
 Passing `:stream` allows redirecting output.
-
 ```
 (with-output-to-string (out)
   (with-slog (:stream out)
