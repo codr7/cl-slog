@@ -16,14 +16,14 @@ The following formats are supported:
 #### :lisp
 ```
 (with-slog ()
-  (slog-write "hello"))
+  (slog-write "hello" :x 42))
 
 (:TIME @2023-03-11T00:06:55.308025+01:00 :MESSAGE "hello" :X 42)
 ```
 #### :text
 ```
 (with-slog (:format :text)
-  (slog-write "hello"))
+  (slog-write "hello" :x 42))
 
 time=2023-3-11 0:7:54:624 message="hello" x=42
 ```
