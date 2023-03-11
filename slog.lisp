@@ -2,6 +2,7 @@
   (:use cl)
   (:import-from local-time +iso-8601-format+ format-timestring now timestamp)
   (:export *log*
+	   *json-time-format*
 	   *text-time-format*
 	   slog-context
 	   slog-format
@@ -26,9 +27,9 @@
 (in-package slog)
 
 (defvar *log*)
-
-(defvar +text-time-format+ '(:year #\- :month #\- :day #\space :hour #\: :min #\: :sec #\: :msec))
-
+(defvar *text-time-format* '(:year #\- :month #\- :day #\space :hour #\: :min #\: :sec #\: :msec))
+(defvar *json-time-format* `(#\" ,@+iso-8601-format+ #\"))
+  
 (defmacro with-slog ((&rest args) &body body)
   `(let ((*log* (slog-new ,@args)))
      ,@body))
@@ -71,13 +72,10 @@
   "f")
 
 (defmethod slog-format-value ((fmt (eql :json)) (val timestamp))
-  (with-output-to-string (out)
-    (write-char #\" out)
-    (format-timestring out val :format +iso-8601-format+)
-    (write-char #\" out)))
+  (format-timestring nil val :format *json-time-format*))
 
 (defmethod slog-format-value ((fmt (eql :text)) (val timestamp))
-  (format-timestring nil val :format +text-time-format+))
+  (format-timestring nil val :format *text-time-format*))
 
 (defmethod slog-format-attribute ((fmt (eql :json)) key val)
   (format nil "\"~a\":~a" (slog-format-key fmt key) (slog-format-value fmt val)))
@@ -211,4 +209,4 @@
 		     (with-slog (:stream result
 				 :format :json)
 		       (slog-write-record *log* t "hello" :foo 1 :bar "baz")))
-		   (format nil "{\"time\"=true, \"message\"=\"hello\", \"foo\"=1, \"bar\"=\"baz\"}~%"))))
+		   (format nil "{\"time\":true, \"message\":\"hello\", \"foo\":1, \"bar\":\"baz\"}~%"))))
