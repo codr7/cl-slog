@@ -51,8 +51,8 @@ Tags may be included/excluded in `with-slog`.
 
 Nested lists allows matching multiple tags.
 ```
-(with-slog (:include '((:http request)))
-  (slog-write "hello" :tag http :tag request))
+(with-slog (:include '((:http :request)))
+  (slog-write "hello" :tag :http :tag :request))
 ```
 
 ### Contexts
