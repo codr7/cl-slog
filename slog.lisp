@@ -1,6 +1,6 @@
 (defpackage slog
   (:use cl)
-  (:import-from local-time +iso-8601-format+ format-timestring now timestamp)
+  (:import-from timestamp now timestamp)
   (:export *log*
 	   *json-time-format*
 	   *text-time-format*
@@ -21,14 +21,11 @@
 	   slog-write
 	   slog-write-record
 	   with-slog
-	   with-slog-context
-	   test))
+	   with-slog-context))
 
 (in-package slog)
 
 (defvar *log*)
-(defvar *text-time-format* '(:year #\- :month #\- :day #\space :hour #\: :min #\: :sec #\: :msec))
-(defvar *json-time-format* `(#\" ,@+iso-8601-format+ #\"))
   
 (defmacro with-slog ((&rest args) &body body)
   `(let ((*log* (slog-new ,@args)))
@@ -71,11 +68,11 @@
 (defmethod slog-format-value ((fmt (eql :text)) (val (eql nil)))
   "f")
 
-(defmethod slog-format-value ((fmt (eql :json)) (val timestamp))
-  (format-timestring nil val :format *json-time-format*))
-
-(defmethod slog-format-value ((fmt (eql :text)) (val timestamp))
-  (format-timestring nil val :format *text-time-format*))
+(defmethod slog-format-value (fmt (val timestamp))
+  (with-output-to-string (out)
+    (write-char #\" out)
+    (print-object val out)
+    (write-char #\" out)))
 
 (defmethod slog-format-attribute ((fmt (eql :json)) key val)
   (format nil "\"~a\":~a" (slog-format-key fmt key) (slog-format-value fmt val)))
@@ -159,54 +156,3 @@
 
 (defun slog-write (msg &rest ats)
   (apply #'slog-write-record *log* (now) msg ats))
-
-(defun test ()
-  (assert (string= (with-output-to-string (result)
-		     (with-slog (:stream result
-				 :format :text)
-		       (slog-write-record *log* t "hello" :tag :http :tag :request)))
-		   (format nil "time=t message=\"hello\"~%")))
-  (assert (string= (with-output-to-string (result)
-		     (with-slog (:stream result
-				 :format :text
-				 :include '(:http))
-		       (slog-write-record *log* t "hello" :tag :http :tag :request)))
-		   (format nil "time=t message=\"hello\"~%")))
-  (assert (string= (with-output-to-string (result)
-		     (with-slog (:stream result
-				 :format :text
-				 :include '((:http :request)))
-		       (slog-write-record *log* t "hello" :tag :http :tag :request)))
-		   (format nil "time=t message=\"hello\"~%")))
-  (assert (string= (with-output-to-string (result)
-		     (with-slog (:stream result
-				 :format :text
-				 :exclude '(:http))
-		       (slog-write-record *log* t "hello" :tag :http :tag :request)))
-		   ""))
-  (assert (string= (with-output-to-string (result)
-		     (with-slog (:stream result
-				 :format :text
-				 :include '(:http)
-				 :exclude '(:request))
-		       (slog-write-record *log* t "hello" :tag :http :tag :request)))
-		   ""))
-  (assert (string= (with-output-to-string (result)
-		     (with-slog (:stream result
-				 :format :text
-				 :include '((:http :request))
-				 :exclude '(:request))
-		       (slog-write-record *log* t "hello" :tag :http :tag :request)))
-		   ""))
-  (assert (string= (with-output-to-string (result)
-		     (with-slog (:stream result
-				 :format :text)
-		       (with-slog-context (:x 42)
-			 (slog-write-record *log* t "hello"))))
-		   (format nil "time=t message=\"hello\" x=42~%")))
-
-  (assert (string= (with-output-to-string (result)
-		     (with-slog (:stream result
-				 :format :json)
-		       (slog-write-record *log* t "hello" :foo 1 :bar "baz")))
-		   (format nil "{\"time\":true, \"message\":\"hello\", \"foo\":1, \"bar\":\"baz\"}~%"))))

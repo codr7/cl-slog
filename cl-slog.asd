@@ -5,6 +5,7 @@
   :author "codr7"
   :description "Structured logging"
   :licence "MIT"
-  :depends-on ("local-time")
+  :depends-on ("cl-timestamp")
   :serial t
-  :components ((:file "slog")))
+  :components ((:file "slog")
+	       (:file "test")))
